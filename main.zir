@@ -1,0 +1,207 @@
+import std::io;
+
+fn main() : i32 {
+    printf("=== Welcome to Zirion RPG Game ===\n");
+    printf("A simple text-based RPG game written in Zirion!\n\n");
+
+    // Player stats
+    i32 player_health = 100;
+    i32 player_gold = 50;
+    i32 player_attack = 5;
+    i32 player_defense = 3;
+
+    // Item types
+    i32 ITEM_TYPE_WEAPON = 0;
+    i32 ITEM_TYPE_ARMOR = 1;
+    i32 ITEM_TYPE_POTION = 2;
+
+    // Player inventory - simplification for now
+    i32 inventory_sword = 1;     // 0=none, 1=wooden, 2=iron, 3=steel
+    i32 inventory_armor = 1;     // 0=none, 1=leather, 2=chain, 3=steel
+    i32 inventory_potions = 0;   // Count of health potions
+
+    i32 running = 1;
+
+    while (running) {
+        // Main menu
+        printf("=== Main Menu ===\n");
+        printf("1. View Player Stats\n");
+        printf("2. View Inventory\n");
+        printf("3. Visit Shop\n");
+        printf("4. Use Health Potion\n");
+        printf("5. Fight Enemy\n");
+        printf("6. Exit Game\n");
+        printf("Enter your choice: ");
+
+        i32 choice;
+        scanf("%d", &choice);
+        printf("\n");
+
+        if (choice == 1) {
+            // Display player stats
+            printf("=== Player Stats ===\n");
+            printf("Health: %d/100\n", player_health);
+            printf("Gold: %d\n", player_gold);
+            printf("Attack: %d\n", player_attack);
+            printf("Defense: %d\n", player_defense);
+            printf("\n");
+        } else if (choice == 2) {
+            // Display inventory
+            printf("=== Inventory ===\n");
+
+            // Display weapon
+            printf("Weapon: ");
+            if (inventory_sword == 0) { printf("None\n"); }
+            else if (inventory_sword == 1) { printf("Wooden Sword (Attack +3)\n"); }
+            else if (inventory_sword == 2) { printf("Iron Sword (Attack +8)\n"); }
+            else if (inventory_sword == 3) { printf("Steel Sword (Attack +15)\n"); }
+
+            // Display armor
+            printf("Armor: ");
+            if (inventory_armor == 0) { printf("None\n"); }
+            else if (inventory_armor == 1) { printf("Leather Armor (Defense +5)\n"); }
+            else if (inventory_armor == 2) { printf("Chain Mail (Defense +12)\n"); }
+            else if (inventory_armor == 3) { printf("Steel Armor (Defense +20)\n"); }
+
+            // Display potions
+            printf("Health Potions: %d\n", inventory_potions);
+            printf("\n");
+        } else if (choice == 3) {
+            // Simple shop interface
+            printf("=== Shop ===\n");
+            printf("Available Items:\n");
+            printf("1. Iron Sword - 50 gold\n");
+            printf("2. Steel Sword - 100 gold\n");
+            printf("3. Chain Mail - 60 gold\n");
+            printf("4. Steel Armor - 120 gold\n");
+            printf("5. Health Potion - 20 gold\n");
+            printf("6. Return to main menu\n");
+
+            printf("Enter your choice (1-6): ");
+            i32 shop_choice;
+            scanf("%d", &shop_choice);
+            printf("\n");
+
+            if (shop_choice >= 1 && shop_choice <= 5) {
+                // Buy item logic
+                i32 item_id = shop_choice;
+                i32 price = 0;
+
+                // Set price based on item
+                if (item_id == 1) { price = 50; }        // Iron Sword
+                else if (item_id == 2) { price = 100; }  // Steel Sword
+                else if (item_id == 3) { price = 60; }   // Chain Mail
+                else if (item_id == 4) { price = 120; }  // Steel Armor
+                else if (item_id == 5) { price = 20; }   // Health Potion
+
+                // Check if player has enough gold
+                if (player_gold < price) {
+                    printf("Not enough gold! Required: %d, Available: %d\n", price, player_gold);
+                } else {
+                    // Purchase the item
+                    player_gold = player_gold - price;
+
+                    // Add item to inventory
+                    if (item_id == 1) {      // Iron Sword
+                        inventory_sword = 2;
+                        player_attack = player_attack + 5; // Upgrade from wooden to iron
+                        printf("Bought Iron Sword! Attack increased.\n");
+                    }
+                    else if (item_id == 2) { // Steel Sword
+                        inventory_sword = 3;
+                        player_attack = player_attack + 7; // Upgrade from iron to steel
+                        printf("Bought Steel Sword! Attack increased.\n");
+                    }
+                    else if (item_id == 3) { // Chain Mail
+                        inventory_armor = 2;
+                        player_defense = player_defense + 7; // Upgrade from leather to chain
+                        printf("Bought Chain Mail! Defense increased.\n");
+                    }
+                    else if (item_id == 4) { // Steel Armor
+                        inventory_armor = 3;
+                        player_defense = player_defense + 8; // Upgrade from chain to steel
+                        printf("Bought Steel Armor! Defense increased.\n");
+                    }
+                    else if (item_id == 5) { // Health Potion
+                        inventory_potions = inventory_potions + 1;
+                        printf("Bought Health Potion!\n");
+                    }
+
+                    printf("Remaining gold: %d\n", player_gold);
+                }
+            } else if (shop_choice == 6) {
+                printf("Returning to main menu...\n");
+            } else {
+                printf("Invalid shop choice.\n");
+            }
+            printf("\n");
+        } else if (choice == 4) {
+            // Use health potion logic
+            if (inventory_potions <= 0) {
+                printf("No health potions available!\n");
+            } else if (player_health >= 100) {
+                printf("Health already at maximum!\n");
+            } else {
+                // Use potion
+                inventory_potions = inventory_potions - 1;
+                player_health = player_health + 25;
+
+                // Cap health at maximum
+                if (player_health > 100) {
+                    player_health = 100;
+                }
+
+                printf("Used Health Potion! Health restored to %d/100\n", player_health);
+            }
+            printf("\n");
+        } else if (choice == 5) {
+            // Combat system
+            i32 enemy_health = 50;
+            i32 enemy_attack = 3;
+            i32 enemy_defense = 2;
+
+            printf("\n=== Combat Started! ===\n");
+            printf("A wild enemy appears! (Health: %d, Attack: %d, Defense: %d)\n", 
+                   enemy_health, enemy_attack, enemy_defense);
+
+            while (enemy_health > 0 && player_health > 0) {
+                // Player turn
+                i32 damage = player_attack - enemy_defense;
+                if (damage < 1) { damage = 1; }
+                enemy_health = enemy_health - damage;
+                printf("You attack! Deal %d damage. Enemy health: %d\n", damage, enemy_health);
+
+                if (enemy_health <= 0) {
+                    printf("Victory! You defeated the enemy!\n");
+                    i32 gold_reward = 25;
+                    player_gold = player_gold + gold_reward;
+                    printf("You earned %d gold!\n", gold_reward);
+                    enemy_health = 0;  // To exit the loop
+                }
+
+                // Enemy turn
+                damage = enemy_attack - player_defense;
+                if (damage < 1) { damage = 1; }
+                player_health = player_health - damage;
+                printf("Enemy attacks! You take %d damage. Your health: %d\n", damage, player_health);
+
+                if (player_health <= 0) {
+                    printf("Game Over! The enemy defeated you!\n");
+                    running = 0;
+                    enemy_health = 0;  // To exit the loop
+                }
+
+                printf("\nPress Enter to continue...");
+                getchar();
+            }
+            printf("\n");
+        } else if (choice == 6) {
+            running = 0;
+            printf("Thank you for playing Zirion RPG! Goodbye!\n");
+        } else {
+            printf("Invalid choice. Please try again.\n\n");
+        }
+    }
+
+    return 0;
+}
